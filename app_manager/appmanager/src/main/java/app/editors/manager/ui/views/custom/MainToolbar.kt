@@ -10,10 +10,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.documents.core.network.common.contracts.ApiContract
-import app.documents.core.network.webdav.WebDavService
 import app.documents.core.storage.account.CloudAccount
 import app.editors.manager.R
+import app.editors.manager.app.accountOnline
 import app.editors.manager.managers.utils.GlideUtils
+import app.editors.manager.managers.utils.ManagerUiUtils
 import com.bumptech.glide.Glide
 import lib.toolkit.base.managers.utils.AccountUtils
 
@@ -35,7 +36,7 @@ class MainToolbar @JvmOverloads constructor(
     private val subtitle by lazy { findViewById<AppCompatTextView>(R.id.toolbarSubTitle) }
 
 
-    var account: CloudAccount? = null
+    private val cloudAccount: CloudAccount? = context.accountOnline
 
     var accountListener: ((view: View) -> Unit)? = null
         set(value) {
@@ -48,8 +49,7 @@ class MainToolbar @JvmOverloads constructor(
         arrowIcon.isVisible = isShow
     }
 
-    fun bind(cloudAccount: CloudAccount?) {
-        account = cloudAccount
+    fun bind() {
         cloudAccount?.let {
             title.text = cloudAccount.name
             subtitle.text = cloudAccount.portal
@@ -74,7 +74,7 @@ class MainToolbar @JvmOverloads constructor(
     private fun loadAvatar(cloudAccount: CloudAccount) {
         AccountUtils.getToken(
             context,
-            account?.getAccountName() ?: ""
+            cloudAccount.getAccountName()
         )?.let {
             val url = if (
                 cloudAccount.avatarUrl?.contains(ApiContract.SCHEME_HTTP) == true ||
@@ -114,41 +114,7 @@ class MainToolbar @JvmOverloads constructor(
     }
 
     private fun setWebDavAvatar(provider: String) {
-        when (WebDavService.Providers.valueOf(provider)) {
-            WebDavService.Providers.Yandex -> toolbarIcon.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_storage_yandex
-                )
-            )
-            WebDavService.Providers.NextCloud -> toolbarIcon.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_storage_nextcloud
-                )
-            )
-            WebDavService.Providers.OwnCloud -> toolbarIcon.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_storage_owncloud
-                )
-            )
-            WebDavService.Providers.KDrive -> toolbarIcon.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_storage_kdrive
-                )
-            )
-
-            else -> {
-                toolbarIcon.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_storage_webdav
-                    )
-                )
-            }
-        }
+        ManagerUiUtils.setWebDavImage(provider, toolbarIcon)
     }
 
 }
