@@ -247,11 +247,16 @@ object ActivitiesUtils {
     }
 }
 
-fun Intent.clearIntent() {
+fun Intent.clearIntent(): Intent {
     replaceExtras(Bundle())
     action = ""
     data = null
     flags = 0
+    return this
+}
+
+fun Activity.clearIntent() {
+    intent = intent.clearIntent()
 }
 
 class DocumentsPicker(

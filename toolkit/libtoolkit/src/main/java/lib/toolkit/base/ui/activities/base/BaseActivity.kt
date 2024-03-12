@@ -1,7 +1,6 @@
 package lib.toolkit.base.ui.activities.base
 
 import android.Manifest
-import android.animation.AnimatorInflater
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.IBinder
@@ -22,13 +21,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import lib.toolkit.base.R
-import lib.toolkit.base.managers.utils.*
+import lib.toolkit.base.managers.utils.ActivitiesUtils
+import lib.toolkit.base.managers.utils.FragmentUtils
+import lib.toolkit.base.managers.utils.KeyboardUtils
+import lib.toolkit.base.managers.utils.PermissionUtils
+import lib.toolkit.base.managers.utils.UiUtils
 import lib.toolkit.base.ui.dialogs.common.CommonDialog
-import lib.toolkit.base.ui.dialogs.common.holders.*
+import lib.toolkit.base.ui.dialogs.common.holders.CustomHolder
+import lib.toolkit.base.ui.dialogs.common.holders.EditLineHolder
+import lib.toolkit.base.ui.dialogs.common.holders.EditMultilineHolder
+import lib.toolkit.base.ui.dialogs.common.holders.InfoHolder
+import lib.toolkit.base.ui.dialogs.common.holders.ProgressHolder
+import lib.toolkit.base.ui.dialogs.common.holders.QuestionHolder
+import lib.toolkit.base.ui.dialogs.common.holders.WaitingHolder
 import moxy.MvpAppCompatActivity
 
 
@@ -278,7 +286,7 @@ abstract class BaseActivity : MvpAppCompatActivity(), FragmentManager.OnBackStac
         showToast(resources.getString(resource))
     }
 
-    protected fun showToast(string: String) {
+    private fun showToast(string: String) {
         toast?.setText(string)
         toast?.show()
     }
@@ -479,7 +487,11 @@ abstract class BaseActivity : MvpAppCompatActivity(), FragmentManager.OnBackStac
         question: String?,
         acceptErrorTint: Boolean = false
     ) {
-        getQuestionDialog(title, acceptTitle, cancelTitle, question, tag, acceptErrorTint)?.show()
+        UiUtils.showQuestionDialog(applicationContext, title = title, question, acceptTitle = acceptTitle, cancelTitle = cancelTitle, acceptListener = {
+            onAcceptClick(CommonDialog.Dialogs.QUESTION, null, tag)
+        }, cancelListener = {
+            onCancelClick(CommonDialog.Dialogs.QUESTION, tag)
+        }, acceptErrorTint = acceptErrorTint)
     }
 
     fun showEditMultilineDialog(title: String, hint: String, acceptTitle: String?, cancelTitle: String?, tag: String?) {
@@ -502,7 +514,6 @@ abstract class BaseActivity : MvpAppCompatActivity(), FragmentManager.OnBackStac
         commonDialog?.progress()?.update(total, progress)
     }
 
-
     /*
     * AppBarLayout changes
     * */
@@ -516,35 +527,6 @@ abstract class BaseActivity : MvpAppCompatActivity(), FragmentManager.OnBackStac
         val params = toolbar.layoutParams as AppBarLayout.LayoutParams
         params.scrollFlags =
             AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP or AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
-    }
-
-    protected fun setAppBarLayoutElevation(appBarLayout: AppBarLayout) {
-        appBarLayout.stateListAnimator = AnimatorInflater.loadStateListAnimator(this, R.animator.appbar_layout_elevation)
-    }
-
-    protected fun removeAppBarLayoutElevation(appBarLayout: AppBarLayout) {
-        appBarLayout.stateListAnimator = AnimatorInflater.loadStateListAnimator(this, R.animator.appbar_layout_no_elevation)
-    }
-
-    protected fun expandAppBar(appBarLayout: AppBarLayout, isAnimate: Boolean) {
-        appBarLayout.setExpanded(true, isAnimate)
-    }
-
-    protected fun collapseAppBar(appBarLayout: AppBarLayout, isAnimate: Boolean) {
-        appBarLayout.setExpanded(false, isAnimate)
-    }
-
-    protected fun setCollapsingToolbarFix(collapsingToolbar: CollapsingToolbarLayout) {
-        val params = collapsingToolbar.layoutParams as AppBarLayout.LayoutParams
-        params.scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
-        collapsingToolbar.layoutParams = params
-    }
-
-    private fun setCollapsingToolbarScroll(collapsingToolbar: CollapsingToolbarLayout) {
-        val params = collapsingToolbar.layoutParams as AppBarLayout.LayoutParams
-        params.scrollFlags =
-            AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
-        collapsingToolbar.layoutParams = params
     }
 
     protected fun setStatusBarColor(@ColorRes color: Int) {
