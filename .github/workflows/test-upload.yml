@@ -34,7 +34,7 @@ jobs:
       - name: Check for new release and upload to AWS S3
         run: |
           GITHUB_TOKEN=${{ secrets.TOKEN }}
-          GITHUB_API_URL=https://api.github.com/repos/IskandarKurbonov/documents-app-android/releases/latest
+          GITHUB_API_URL=https://api.github.com/repos/ONLYOFFICE/documents-app-android/releases/latest
 
           # Get latest release info
           release_info=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" -s $GITHUB_API_URL)
