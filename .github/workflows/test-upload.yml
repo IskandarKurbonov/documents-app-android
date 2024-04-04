@@ -51,10 +51,10 @@ jobs:
             wget -qO onlyoffice-documents.apk "$apk_url"
 
             # Upload APK file to AWS S3
-            aws s3 cp onlyoffice-documents.apk ${{ secrets.AWS_BUCKER_URL }}
+            aws s3 cp onlyoffice-documents.apk ${{ secrets.AWS_BUCKET_URL }}
 
             # Clear cache in AWS S3
-            aws s3 rm ${{ secrets.AWS_BUCKER_URL }} --recursive
+            aws s3 rm ${{ secrets.AWS_BUCKET_URL }} --recursive
 
             echo "Upload complete."
           else
