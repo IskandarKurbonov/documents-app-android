@@ -7,11 +7,12 @@ on:
 
 jobs:
   upload-release:
+    name: "Upload Release Files to AWS S3"
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Hello
         shell: echo hello
