@@ -1,5 +1,5 @@
 name: Upload Release Files to AWS S3
-#
+
 on:
   release:
     types: [created]
