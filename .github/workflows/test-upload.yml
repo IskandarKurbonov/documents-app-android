@@ -20,8 +20,8 @@ jobs:
         uses: paweb88/fetch-gh-release-asset-composite@main
         with:
           repo: "onlyoffice/documents-app-android"
-          version: "tags/v.*"
-          file: "onlyoffice-manager-*.apk"
+          version: "tags/v8.1.0-534"
+          file: "onlyoffice-manager-8.0.1-533.apk"
           target: "./onlyoffice-documents.apk"
           token: ${{ secrets.GITHUB_TOKEN }}
 
