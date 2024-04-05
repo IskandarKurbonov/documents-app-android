@@ -19,10 +19,9 @@ jobs:
       - name: Use release assets
         uses: Itsblue/download-release-assets-action@v1
         with:
-          repo: "linuxmuster/linuxmuster-linbo-gui"
           version: "latest"
           file: "*.apk"
-          token: ${{ secrets.YOUR_TOKEN }}
+          token: ${{ secrets.TOKEN }}
           path: "./assets"
 
       - name: Check directory
