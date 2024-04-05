@@ -1,6 +1,7 @@
 name: Upload Release Files to AWS S3
 
 on:
+  push:
   release:
     types: 
       - created
@@ -15,38 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - id: fetch-latest-release
+        uses: thebritican/fetch-latest-release@v1
+        with:
+          github_token: ${{ github.token }}
+
       - name: Setup AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Check for new release and upload to AWS S3
-        run: |
-          GITHUB_TOKEN=${{ secrets.TOKEN }}
-          GITHUB_API_URL=https://api.github.com/repos/ONLYOFFICE/documents-app-android/releases/latest
-
-          # Get latest release info
-          release_info=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" -s $GITHUB_API_URL)
-          release_tag=$(echo "$release_info" | jq -r '.tag_name')
-          release_id=$(echo "$release_info" | jq -r '.id')
-
-          # Check if APK file exists in the release assets
-          apk_url=$(echo "$release_info" | jq -r '.assets[] | select(.name | test("onlyoffice-manager-[0-9]+\\.apk")) | .browser_download_url')
-
-          if [ -n "$apk_url" ]; then
-            echo "APK file found in release $release_tag. Uploading to AWS S3..."
-
-            # Download APK file
-            wget -qO onlyoffice-documents.apk "$apk_url"
-
-            # Upload APK file to AWS S3
-            aws s3 cp onlyoffice-documents.apk ${{ secrets.AWS_BUCKET_URL }}
-
-            # Clear cache in AWS S3
-            aws s3 rm ${{ secrets.AWS_BUCKET_URL }} --recursive
-
-            echo "Upload complete."
-          else
-            echo "APK file not found in release $release_tag."
-          fi
