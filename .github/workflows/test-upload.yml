@@ -16,9 +16,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-              
-      - name: Fetch Latest Release
-        uses: gregziegan/fetch-latest-release@v2.0.0
+      - name: Use release assets
+        uses: Itsblue/download-release-assets-action@v1
+        with:
+          repo: "linuxmuster/linuxmuster-linbo-gui"
+          version: "latest"
+          file: "*.zip"
+          token: ${{ secrets.YOUR_TOKEN }}
+          path: "./assets"
+
+      - name: Check directory
+        run: ls -lha ./assets
 
       - name: Setup AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
