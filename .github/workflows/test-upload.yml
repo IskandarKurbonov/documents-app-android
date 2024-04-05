@@ -22,7 +22,7 @@ jobs:
           repo: "onlyoffice/documents-app-android"
           version: "tags/v8.1.0-534"
           file: "onlyoffice-manager-8.0.1-533.apk"
-          target: "./onlyoffice-documents.apk"
+          target: "./onlyoffice-manager-8.0.1-533.apk"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup AWS credentials
