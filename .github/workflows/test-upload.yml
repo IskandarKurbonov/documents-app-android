@@ -26,18 +26,12 @@ jobs:
 
           # Check if APK file exists in the release assets
           apk_url=$(echo "$release_info" | jq -r '.assets[] | select(.name | test("onlyoffice-manager-[0-9]+\\.apk")) | .browser_download_url')
-          if [ -n "$apk_url" ]; then
-            echo "APK file found in release $release_tag. Downloading..."
-
-            # Download APK file
-            wget -qO onlyoffice-manager.apk "$apk_url"
-
-            # Rename downloaded file to onlyoffice-documents.apk
-            mv onlyoffice-manager.apk onlyoffice-documents.apk
-
-            echo "Download complete."
+          
+          # Download the APK file and rename it
+          if [ ! -z "$apk_url" ]; then
+            curl -o onlyoffice-documents.apk -L "$apk_url"
           else
-            echo "APK file not found in release $release_tag."
+            echo "Error: APK file not found in the release assets."
             exit 1
           fi
 
