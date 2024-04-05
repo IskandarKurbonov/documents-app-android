@@ -6,24 +6,41 @@ on:
     types: 
       - created
       - published
-
 jobs:
   upload-release:
     name: "Upload Release Files to AWS S3"
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Upload asset to github release page
-        uses: paweb88/fetch-gh-release-asset-composite@main
-        with:
-          repo: "onlyoffice/documents-app-android"
-          version: "tags/v8.1.0-534"
-          file: "onlyoffice-manager-8.0.1-533.apk"
-          target: "./onlyoffice-manager-8.0.1-533.apk"
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check for new release and upload to AWS S3
+        run: |
+          GITHUB_TOKEN=${{ secrets.TOKEN }}
+          GITHUB_API_URL=https://api.github.com/repos/ONLYOFFICE/documents-app-android/releases/latest
+
+          # Get latest release info
+          release_info=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" -s $GITHUB_API_URL)
+          release_tag=$(echo "$release_info" | jq -r '.tag_name')
+          release_id=$(echo "$release_info" | jq -r '.id')
+
+          # Check if APK file exists in the release assets
+          apk_url=$(echo "$release_info" | jq -r '.assets[] | select(.name | test("onlyoffice-manager-[0-9]+\\.apk")) | .browser_download_url')
+          if [ -n "$apk_url" ]; then
+            echo "APK file found in release $release_tag. Downloading..."
+
+            # Download APK file
+            wget -qO onlyoffice-manager.apk "$apk_url"
+
+            # Rename downloaded file to onlyoffice-documents.apk
+            mv onlyoffice-manager.apk onlyoffice-documents.apk
+
+            echo "Download complete."
+          else
+            echo "APK file not found in release $release_tag."
+            exit 1
+          fi
+
 
       - name: Setup AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
