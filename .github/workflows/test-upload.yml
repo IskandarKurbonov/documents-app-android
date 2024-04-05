@@ -19,7 +19,7 @@ jobs:
       - uses: houqp/download-release-assets@v1
         with:
           token: "{{ secrets.TOKEN }}"
-          repo: onlyoffice/documents-app-android
+          repo: iskandarkurbonov/documents-app-android
           match: "onlyoffice-manager-.+.apk"
           rename: onlyoffice-documents
 
