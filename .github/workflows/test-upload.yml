@@ -15,6 +15,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Download APK file and Upload on AWS S3
         run: |
           GITHUB_TOKEN=${{ secrets.TOKEN }}
@@ -32,18 +38,11 @@ jobs:
               echo "Error: APK file not found in the release assets."
               exit 1
           fi
-          ls -lha
-          
+          aws s3 cp onlyoffice-documents.apk  ${{ secrets.AWS_BUCKET_URL }}/install/mobile/android/ 
 
       - name: Invalidate AWS CLOUDFRONT cache
         run: |
              aws cloudfront create-invalidation \
                 --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} \
                 --paths \
-                "/install/mobile/android/onlyoffice-documents.apk"          
-
-      - name: Setup AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                "/install/mobile/android/onlyoffice-documents.apk"
