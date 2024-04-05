@@ -2,9 +2,7 @@ name: Upload Release Files to AWS S3
 
 on:
   release:
-    types: 
-      - created
-      - published
+    types: [created]
 
 jobs:
   upload-release:
@@ -26,18 +24,15 @@ jobs:
           GITHUB_API_URL=https://api.github.com/repos/ONLYOFFICE/documents-app-android/releases/latest
 
           release_info=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" -s $GITHUB_API_URL)
-          release_tag=$(echo "$release_info" | jq -r '.tag_name')
-          release_id=$(echo "$release_info" | jq -r '.id')
 
           apk_url=$(echo "$release_info" | jq -r '.assets[] | select(.name | test("onlyoffice-manager-.*\\.apk")) | .browser_download_url')
 
           if [ ! -z "$apk_url" ]; then
               curl -o onlyoffice-documents.apk -L "$apk_url"
+              aws s3 cp onlyoffice-documents.apk  ${{ secrets.AWS_BUCKET_URL }}/install/mobile/android/ 
           else
-              echo "Error: APK file not found in the release assets."
-              exit 1
+              echo "Error: APK file not found in the release assets. Skipping upload to AWS S3."
           fi
-          aws s3 cp onlyoffice-documents.apk  ${{ secrets.AWS_BUCKET_URL }}/install/mobile/android/ 
 
       - name: Invalidate AWS CLOUDFRONT cache
         run: |
