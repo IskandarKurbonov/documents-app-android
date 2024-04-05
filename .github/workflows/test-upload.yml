@@ -16,11 +16,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: houqp/download-release-assets@v1
+      - name: Upload asset to github release page
+        uses: paweb88/fetch-gh-release-asset-composite@master
         with:
-          repo: iskandarkurbonov/documents-app-android
-          match: "onlyoffice-manager-.+.apk"
-          rename: onlyoffice-documents
+          repo: "onlyoffice/documents-app-android"
+          version: "tags/v.*"
+          file: "onlyoffice-manager-*.apk"
+          target: "./onlyoffice-documents.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
