@@ -31,8 +31,8 @@ jobs:
               echo "Error: APK file not found in the release assets."
               exit 1
           fi
-
-          aws s3 cp onlyoffice-documents.apk  ${{ secrets.AWS_BUCKER_URL }}/install/mobile/android/
+          ls -lha
+          # aws s3 cp onlyoffice-documents.apk  ${{ secrets.AWS_BUCKER_URL }}/install/mobile/android/
 
       - name: Invalidate AWS CLOUDFRONT cache
         run: |
