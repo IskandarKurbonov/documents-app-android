@@ -14,27 +14,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check for new release and upload to AWS S3
+      - name: Download APK file and Upload on AWS S3
         run: |
           GITHUB_TOKEN=${{ secrets.TOKEN }}
           GITHUB_API_URL=https://api.github.com/repos/ONLYOFFICE/documents-app-android/releases/latest
 
-          # Get latest release info
           release_info=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" -s $GITHUB_API_URL)
           release_tag=$(echo "$release_info" | jq -r '.tag_name')
           release_id=$(echo "$release_info" | jq -r '.id')
 
-          # Check if APK file exists in the release assets
-          apk_url=$(echo "$release_info" | jq -r '.assets[] | select(.name | test("onlyoffice-manager-[0-9]+\\.apk")) | .browser_download_url')
-          
-          # Download the APK file and rename it
+          apk_url=$(echo "$release_info" | jq -r '.assets[] | select(.name | test("onlyoffice-manager-.*\\.apk")) | .browser_download_url')
+
           if [ ! -z "$apk_url" ]; then
-            curl -o onlyoffice-documents.apk -L "$apk_url"
+              curl -o onlyoffice-documents.apk -L "$apk_url"
           else
-            echo "Error: APK file not found in the release assets."
-            exit 1
+              echo "Error: APK file not found in the release assets."
+              exit 1
           fi
 
+          aws s3 cp onlyoffice-documents.apk  ${{ secrets.AWS_BUCKER_URL }}/install/mobile/android/
+
+      - name: Invalidate AWS CLOUDFRONT cache
+        run: |
+             aws cloudfront create-invalidation \
+                --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} \
+                --paths \
+                "/install/mobile/android/onlyoffice-documents.apk"          
 
       - name: Setup AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
