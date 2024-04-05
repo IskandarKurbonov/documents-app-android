@@ -32,7 +32,7 @@ jobs:
               exit 1
           fi
           ls -lha
-          # aws s3 cp onlyoffice-documents.apk  ${{ secrets.AWS_BUCKER_URL }}/install/mobile/android/
+          
 
       - name: Invalidate AWS CLOUDFRONT cache
         run: |
