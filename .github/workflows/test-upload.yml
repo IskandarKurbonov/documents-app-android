@@ -16,16 +16,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use release assets
-        uses: Itsblue/download-release-assets-action@v1
+      - name: Get latest release of ONLYOFFICE documents apk
+        uses: rez0n/actions-github-release@main
+        id: documents-apk
         with:
-          version: "latest"
-          file: "*.apk"
           token: ${{ secrets.TOKEN }}
-          path: "./assets"
+          repository: "onlyoffice/documents-app-android"
+          type: "latest"
 
       - name: Check directory
-        run: ls -lha ./assets
+        run: echo ${{ steps.node_release.outputs.release }}
 
       - name: Setup AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
