@@ -21,7 +21,7 @@ jobs:
         with:
           repo: "linuxmuster/linuxmuster-linbo-gui"
           version: "latest"
-          file: "*.zip"
+          file: "*.apk"
           token: ${{ secrets.YOUR_TOKEN }}
           path: "./assets"
 
