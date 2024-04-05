@@ -6,6 +6,7 @@ on:
     types: 
       - created
       - published
+
 jobs:
   upload-release:
     name: "Upload Release Files to AWS S3"
